@@ -15,6 +15,11 @@ setup(
 		'nmj.db',
 		'nmj.scanners',
 	],
+	install_requires=[
+		"pytvdbapi",
+		"requests",
+		"tmdbsimple"
+	],
 	scripts=['scripts/pynmj',]
 )
 
