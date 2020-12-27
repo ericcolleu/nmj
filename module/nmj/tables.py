@@ -37,14 +37,25 @@ class DatabaseItem(object):
 	@classmethod
 	def load(cls, cursor, **kwargs):
 		where_clause = ""
+		order_by_clause = ""
+		limit_clause = ""
 		params = []
-		if kwargs:
+		where = kwargs.pop("where", None)
+		order_by = kwargs.pop("order_by", None)
+		limit = kwargs.pop("limit", None)
+		if limit:
+			limit_clause=" LIMIT %s" % limit
+		if order_by:
+			order_by_clause=" ORDER BY %s " % order_by
+		if where:
+			where_clause = " WHERE %s" % where
+		elif kwargs:
 			where_clauses = []
 			for key, value in kwargs.items():
 				where_clauses.append("%s=?" % key.upper())
 				params.append(value)
 			where_clause = " WHERE " + "AND ".join(where_clauses)
-		cmd="""SELECT %s from %s%s;""" % (",".join(cls.FIELDS.keys()), cls.TABLE, where_clause)
+		cmd="""SELECT %s from %s%s%s%s;""" % (",".join(cls.FIELDS.keys()), cls.TABLE, where_clause, order_by_clause, limit_clause)
 		_LOGGER.debug("get %s items: %s with params %s", cls.__name__, cmd, params)
 		db_instances = cursor.execute(cmd, params)
 		py_instances = []
